@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LBD.DAL.Interfaces
 {
-    public interface ILBDClient: ILbdDb
+    public interface ILBDClient: ILbdDb,IDisposable
     {
 
     }

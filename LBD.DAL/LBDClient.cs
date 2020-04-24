@@ -7,7 +7,7 @@ using System.Text;
 
 namespace LBD.DAL
 {
-    public  class LBDClient : ILBDClient
+    public  class LBDClient : ILBDClient,IDisposable
     {
         public LBDClient(ConnectionConfig connectionConfig)
         {
@@ -30,6 +30,12 @@ namespace LBD.DAL
         {
             this._provider.db.Delete(t);
         }
+
+        public void Dispose()
+        {
+            GC.Collect();
+        }
+
         public  T Find<T>(int id) where T : LbdBaseModel, new()
         {
             return this._provider.db.Find<T>(id);
