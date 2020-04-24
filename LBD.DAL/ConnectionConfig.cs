@@ -1,10 +1,4 @@
-﻿using LBD.DAL.Interfaces;
-using LBD.DAL.Mysql;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Text;
-using DbType = LBD.DAL.Interfaces.DbType;
+﻿using DbType = LBD.DAL.Interfaces.DbType;
 
 namespace LBD.DAL
 {

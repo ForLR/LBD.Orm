@@ -21,7 +21,7 @@ namespace LBD.Framework.Validates
                 {
                     if (!lbd.Validate(value))
                     {
-                        throw new Exception("数据验证错误");
+                        throw new LbdException("数据验证错误");
                     }
                 }
                 

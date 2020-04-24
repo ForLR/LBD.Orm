@@ -1,8 +1,6 @@
 ﻿using LBD.DAL.Interfaces;
-using LBD.Framework;
 using LBD.Framework.ExppressionExtends;
 using LBD.Framework.Extends;
-using LBD.Framework.MappingExtend;
 using LBD.Framework.SQLCache;
 using LBD.Framework.Validates;
 using LBD.Model;
@@ -12,36 +10,39 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
 using DbType = LBD.DAL.Interfaces.DbType;
 
 namespace LBD.DAL.Mysql
 {
     class MysqlHelperDelay : ILbdDb
     {
-        public MysqlHelperDelay(string connection)
+        internal MysqlHelperDelay(string connection)
         {
             connStr = connection;
+            MySqlAdo.SetConnStr(connStr);
         }
+
         //public static string connStr= ConfigMange.GetConnStr();
         public static string connStr { get; set; }
+
 
         private static IList<MySqlCommand> _Commands=new List<MySqlCommand>();
 
         public DbType DbType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+
         public  T Find<T>(int id) where T: LbdBaseModel,new()
         {
+
             var sql = MysqlCache<T>.GetSelect();
-            var result = MySqlAdo.DataReaderToGenerics<T>(connStr,sql, new MySqlParameter("@Id", id));
+            var result = MySqlAdo.DataReaderToGenerics<T>(sql, new MySqlParameter("@Id", id));
             return result;
         }
         public T Find<T>(Expression<Func<T,bool>> expression) where T : LbdBaseModel, new()
         {
             
             var sql = ExpressionToSql.Find(expression);
-            var result = MySqlAdo.DataReaderToGenerics<T>(connStr, sql,null);
+            var result = MySqlAdo.DataReaderToGenerics<T>( sql,null);
             return result;
         }
         public void Insert<T>(T t)where T: LbdBaseModel, new()
@@ -114,7 +115,7 @@ namespace LBD.DAL.Mysql
         public IEnumerable<T> FindList<T>(Expression<Func<T, bool>> expression) where T : LbdBaseModel, new()
         {
             var sql = ExpressionToSql.Find(expression);
-            var result = MySqlAdo.DataReaderToGenericsList<T>(connStr, sql, null);
+            var result = MySqlAdo.DataReaderToGenericsList<T>( sql, null);
             return result;
         }
 
@@ -141,14 +142,25 @@ namespace LBD.DAL.Mysql
             }
         }
 
-        public void InsertList<T>(IEnumerable<T> t) where T : LbdBaseModel, new()
+        /// <summary>
+        /// 多条insert（临时版本）
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ts"></param>
+        public void InsertList<T>(IEnumerable<T> ts) where T : LbdBaseModel, new()
         {
 
-            //t.Validate();
-            //var sql = MysqlCache<T>.GetInsert(t, out MySqlParameter[] parameters);
-            //MySqlCommand command = new MySqlCommand(sql);
-            //command.Parameters.AddRange(parameters);
-            //_Commands.Add(command);
+          
+            foreach (var item in ts)
+            {
+                item.Validate();
+                var sql = MysqlCache<T>.GetInsert(item, out MySqlParameter[] parameters);
+                MySqlCommand command = new MySqlCommand(sql);
+                command.Parameters.AddRange(parameters);
+                _Commands.Add(command);
+            }
+           
+          
         }
     }
 }

@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <Folder Include="Abstracts\" />
+    <Folder Include="SqlServer\" />
   </ItemGroup>
 
 </Project>
