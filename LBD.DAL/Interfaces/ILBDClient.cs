@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LBD.DAL.Interfaces
 {
-    public interface ILBDClient: ILbdDb,IDisposable
+    /// <summary>
+    /// 客户端接口
+    /// </summary>
+    public interface ILBDClient : ILbdDb, IDisposable
     {
 
     }

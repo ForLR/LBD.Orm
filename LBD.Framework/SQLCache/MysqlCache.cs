@@ -44,7 +44,7 @@ namespace LBD.Framework.SQLCache
 
             propertyInfos = _Type.GetProperties();
 
-            _KeyProperty= _Type.GetPropertyLBDKye();
+            _KeyProperty = _Type.GetPropertyLBDKye();
 
             _PropertyStr = string.Join(",", propertyInfos.Select(x => x.GetName()));
 
@@ -55,11 +55,11 @@ namespace LBD.Framework.SQLCache
 
             {
 
-                _Insert = $" insert into { _TableName} ({string.Join(",",_Type.GetPropertysWithoutKey().Select(x=>x.GetName())) }) VALUES ({ string.Join(",",_Type.GetPropertysWithoutKey().Select(x=>$"@{x.GetName()}"))  }) ;";
+                _Insert = $" insert into { _TableName} ({string.Join(",", _Type.GetPropertysWithoutKey().Select(x => x.GetName())) }) VALUES ({ string.Join(",", _Type.GetPropertysWithoutKey().Select(x => $"@{x.GetName()}"))  }) ;";
 
             }
             {
-               // _InsertList= $" insert into { _TableName} ({string.Join(",", _Type.GetPropertysWithoutKey().Select(x => x.GetName())) }) VALUES ({ string.Join(",", _Type.GetPropertysWithoutKey().Select(x => $"@{x.GetName()}"))  }) ;";
+                // _InsertList= $" insert into { _TableName} ({string.Join(",", _Type.GetPropertysWithoutKey().Select(x => x.GetName())) }) VALUES ({ string.Join(",", _Type.GetPropertysWithoutKey().Select(x => $"@{x.GetName()}"))  }) ;";
             }
 
             {
@@ -67,7 +67,7 @@ namespace LBD.Framework.SQLCache
             }
 
             {
-                var setSql = string.Join(",", propertyInfos.Where(x=>!x.IsDefined(typeof(LBDKeyAttribute),true)).Select(x =>$"{x.GetName()}=@{x.GetName()}" ));
+                var setSql = string.Join(",", propertyInfos.Where(x => !x.IsDefined(typeof(LBDKeyAttribute), true)).Select(x => $"{x.GetName()}=@{x.GetName()}"));
                 _Update = $" update {_TableName} set {setSql } where Id=@Id";
             }
         }
@@ -77,32 +77,32 @@ namespace LBD.Framework.SQLCache
             return _Select;
         }
 
-        public static string GetUpdate(T t,out MySqlParameter[] parameters)
+        public static string GetUpdate(T t, out MySqlParameter[] parameters)
         {
             var paras = new List<MySqlParameter>();
             foreach (var item in propertyInfos.Where(x => !x.IsDefined(typeof(LBDKeyAttribute), true)))
             {
-                paras.Add(new MySqlParameter($"@{item.GetName()}",item.GetValue(t)));
+                paras.Add(new MySqlParameter($"@{item.GetName()}", item.GetValue(t)));
             }
             var keyPropertName = _KeyProperty.GetName();
-            paras.Add(new MySqlParameter( $"@{keyPropertName}",_KeyProperty.GetValue(t)));
+            paras.Add(new MySqlParameter($"@{keyPropertName}", _KeyProperty.GetValue(t)));
             parameters = paras.ToArray();
             return _Update;
         }
 
-        public static string GetDelete(T t,out MySqlParameter parameter)
+        public static string GetDelete(T t, out MySqlParameter parameter)
         {
-          
+
             var value = _KeyProperty.GetValue(t);
-            if (value==null)
+            if (value == null)
             {
                 throw new Exception("主键值为空");
             }
-            parameter = new MySqlParameter($"@{_KeyProperty.GetName()}",value);
+            parameter = new MySqlParameter($"@{_KeyProperty.GetName()}", value);
             return _Delete;
         }
 
-        public static string GetInsert(T t,out MySqlParameter[]  parameters)
+        public static string GetInsert(T t, out MySqlParameter[] parameters)
         {
             var paras = new List<MySqlParameter>();
 

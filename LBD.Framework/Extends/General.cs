@@ -1,10 +1,10 @@
-﻿using System;
+﻿using LBD.Framework.MappingExtend;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using LBD.Framework.MappingExtend;
 
 namespace LBD.Framework.Extends
 {

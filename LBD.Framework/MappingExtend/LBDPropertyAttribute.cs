@@ -4,10 +4,13 @@ using System.Text;
 
 namespace LBD.Framework.MappingExtend
 {
-    [AttributeUsage( AttributeTargets.Property)]
-    public class LBDPropertyAttribute:LBDAbstractNameAttribute
+    /// <summary>
+    /// 
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property)]
+    public class LBDPropertyAttribute : LBDAbstractNameAttribute
     {
-        public LBDPropertyAttribute(string propertyName):base(propertyName)
+        public LBDPropertyAttribute(string propertyName) : base(propertyName)
         {
 
         }

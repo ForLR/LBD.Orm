@@ -6,6 +6,9 @@ using System.Text;
 
 namespace LBD.Framework.ExppressionExtends
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class ExpressionToSql
     {
 

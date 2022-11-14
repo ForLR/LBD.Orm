@@ -14,6 +14,10 @@ using DbType = LBD.DAL.Interfaces.DbType;
 
 namespace LBD.DAL.Mysql
 {
+
+    /// <summary>
+    /// 
+    /// </summary>
     class MysqlHelperDelay : ILbdDb
     {
         internal MysqlHelperDelay(string connection)
@@ -22,55 +26,90 @@ namespace LBD.DAL.Mysql
             MySqlAdo.SetConnStr(connStr);
         }
 
-        //public static string connStr= ConfigMange.GetConnStr();
+        /// <summary>
+        /// 
+        /// </summary>
         public static string connStr { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private static IList<MySqlCommand> _commands = new List<MySqlCommand>();
 
-        private static IList<MySqlCommand> _Commands=new List<MySqlCommand>();
-
+        /// <summary>
+        /// 
+        /// </summary>
         public DbType DbType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-
-        public  T Find<T>(int id) where T: LbdBaseModel,new()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public T Find<T>(int id) where T : LbdBaseModel, new()
         {
 
             var sql = MysqlCache<T>.GetSelect();
             var result = MySqlAdo.DataReaderToGenerics<T>(sql, new MySqlParameter("@Id", id));
             return result;
         }
-        public T Find<T>(Expression<Func<T,bool>> expression) where T : LbdBaseModel, new()
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public T Find<T>(Expression<Func<T, bool>> expression) where T : LbdBaseModel, new()
         {
-            
+
             var sql = ExpressionToSql.Find(expression);
-            var result = MySqlAdo.DataReaderToGenerics<T>( sql,null);
+            var result = MySqlAdo.DataReaderToGenerics<T>(sql, null);
             return result;
         }
-        public void Insert<T>(T t)where T: LbdBaseModel, new()
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        public void Insert<T>(T t) where T : LbdBaseModel, new()
         {
             t.Validate();
-            var sql = MysqlCache<T>.GetInsert(t,out MySqlParameter[] parameters);
+            var sql = MysqlCache<T>.GetInsert(t, out MySqlParameter[] parameters);
             MySqlCommand command = new MySqlCommand(sql);
             command.Parameters.AddRange(parameters);
-            _Commands.Add(command);
+            _commands.Add(command);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
         public void Update<T>(T t) where T : LbdBaseModel, new()
         {
-            var sql = MysqlCache<T>.GetUpdate(t,out MySqlParameter[] paras);
+            var sql = MysqlCache<T>.GetUpdate(t, out MySqlParameter[] paras);
 
             MySqlCommand command = new MySqlCommand(sql);
             command.Parameters.AddRange(paras);
-            _Commands.Add(command);
+            _commands.Add(command);
 
         }
 
-        public  void Delete<T>(T t) where T : LbdBaseModel, new()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        public void Delete<T>(T t) where T : LbdBaseModel, new()
         {
             var sql = MysqlCache<T>.GetDelete(t, out MySqlParameter parameter);
             MySqlCommand command = new MySqlCommand(sql);
             command.Parameters.Add(parameter);
-            _Commands.Add(command);
-              
+            _commands.Add(command);
+
         }
 
 
@@ -80,7 +119,7 @@ namespace LBD.DAL.Mysql
         public void SavaChange()
         {
 
-            if (_Commands.Any())
+            if (_commands.Any())
             {
                 using (MySqlConnection connection = new MySqlConnection(connStr))
                 {
@@ -88,7 +127,7 @@ namespace LBD.DAL.Mysql
                     using MySqlTransaction trans = connection.BeginTransaction();
                     try
                     {
-                        foreach (MySqlCommand command in _Commands)
+                        foreach (MySqlCommand command in _commands)
                         {
                             command.Connection = connection;
                             command.Transaction = trans;
@@ -104,7 +143,7 @@ namespace LBD.DAL.Mysql
                     }
                     finally
                     {
-                        _Commands?.Clear();
+                        _commands?.Clear();
                     }
 
                 }
@@ -112,13 +151,25 @@ namespace LBD.DAL.Mysql
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
         public IEnumerable<T> FindList<T>(Expression<Func<T, bool>> expression) where T : LbdBaseModel, new()
         {
             var sql = ExpressionToSql.Find(expression);
-            var result = MySqlAdo.DataReaderToGenericsList<T>( sql, null);
+            var result = MySqlAdo.DataReaderToGenericsList<T>(sql, null);
             return result;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public int BulkInsert<T>(IEnumerable<T> t) where T : LbdBaseModel, new()
         {
             string tablename = MysqlCache<T>._TableName;
@@ -149,18 +200,16 @@ namespace LBD.DAL.Mysql
         /// <param name="ts"></param>
         public void InsertList<T>(IEnumerable<T> ts) where T : LbdBaseModel, new()
         {
-
-          
             foreach (var item in ts)
             {
                 item.Validate();
                 var sql = MysqlCache<T>.GetInsert(item, out MySqlParameter[] parameters);
                 MySqlCommand command = new MySqlCommand(sql);
                 command.Parameters.AddRange(parameters);
-                _Commands.Add(command);
+                _commands.Add(command);
             }
-           
-          
+
+
         }
     }
 }

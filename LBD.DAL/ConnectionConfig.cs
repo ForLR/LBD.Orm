@@ -7,14 +7,25 @@ namespace LBD.DAL
     /// </summary>
     public class ConnectionConfig
     {
-        public ConnectionConfig(string conn, DbType dbType= DbType.MYSQL)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="conn">连接字符串</param>
+        /// <param name="dbType">数据库类型</param>
+        public ConnectionConfig(string conn, DbType dbType = DbType.MYSQL)
         {
             this.Connection = conn;
             this.DbType = dbType;
         }
-        
+
+        /// <summary>
+        /// 数据库类型
+        /// </summary>
         public DbType DbType { get; set; }
 
+        /// <summary>
+        /// 连接字符串
+        /// </summary>
         public string Connection { get; set; }
     }
 }

@@ -1,10 +1,13 @@
-﻿    using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
 namespace LBD.Framework.ExppressionExtends
 {
+    /// <summary>
+    /// 常量解析sql
+    /// </summary>
     public class ConditionBuilderVisitor : ExpressionVisitor
     {
 

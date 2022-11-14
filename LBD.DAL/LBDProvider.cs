@@ -1,19 +1,31 @@
 ﻿using LBD.DAL.Interfaces;
 using LBD.DAL.Mysql;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LBD.DAL
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class LBDProvider
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connection"></param>
         public LBDProvider(ConnectionConfig connection)
         {
             _connection = connection;
         }
+        /// <summary>
+        /// 
+        /// </summary>
         private ConnectionConfig _connection { get; set; }
-        public ILbdDb db
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ILbdDb Db
         {
             get
             {

@@ -15,7 +15,7 @@ namespace LBD.Framework.MappingExtend
         /// <returns></returns>
         public static string GetName(this MemberInfo type)
         {
-            if (type.IsDefined(typeof(LBDAbstractNameAttribute),true))
+            if (type.IsDefined(typeof(LBDAbstractNameAttribute), true))
             {
                 LBDAbstractNameAttribute name = type.GetCustomAttribute<LBDAbstractNameAttribute>();
                 return name.GetName();
@@ -40,7 +40,7 @@ namespace LBD.Framework.MappingExtend
         /// <returns></returns>
         public static PropertyInfo GetPropertyLBDKye(this Type type)
         {
-            if (type.GetProperties().Count(x => x.IsDefined(typeof(LBDKeyAttribute), true))>1)
+            if (type.GetProperties().Any(x => x.IsDefined(typeof(LBDKeyAttribute), true)))
             {
                 throw new LbdException("不支持的多主键");
             }
