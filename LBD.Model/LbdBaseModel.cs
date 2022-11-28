@@ -9,5 +9,7 @@ namespace LBD.Model
     {
         [LBDKey("Id", true)]
         public int Id { get; set; }
+
+       
     }
 }

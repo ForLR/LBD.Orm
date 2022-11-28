@@ -26,29 +26,29 @@ namespace LBD.DAL.Mysql
         public static string connStr { get; set; }
 
 
-        private static IList<MySqlCommand> _Commands=new List<MySqlCommand>();
+        private static IList<MySqlCommand> _Commands = new List<MySqlCommand>();
 
         public DbType DbType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
 
-        public  T Find<T>(int id) where T: LbdBaseModel,new()
+        public T Find<T>(int id) where T : LbdBaseModel, new()
         {
 
             var sql = MysqlCache<T>.GetSelect();
             var result = MySqlAdo.DataReaderToGenerics<T>(sql, new MySqlParameter("@Id", id));
             return result;
         }
-        public T Find<T>(Expression<Func<T,bool>> expression) where T : LbdBaseModel, new()
+        public T Find<T>(Expression<Func<T, bool>> expression) where T : LbdBaseModel, new()
         {
-            
+
             var sql = ExpressionToSql.Find(expression);
-            var result = MySqlAdo.DataReaderToGenerics<T>( sql,null);
+            var result = MySqlAdo.DataReaderToGenerics<T>(sql, null);
             return result;
         }
-        public void Insert<T>(T t)where T: LbdBaseModel, new()
+        public void Insert<T>(T t) where T : LbdBaseModel, new()
         {
             t.Validate();
-            var sql = MysqlCache<T>.GetInsert(t,out MySqlParameter[] parameters);
+            var sql = MysqlCache<T>.GetInsert(t, out MySqlParameter[] parameters);
             MySqlCommand command = new MySqlCommand(sql);
             command.Parameters.AddRange(parameters);
             _Commands.Add(command);
@@ -56,7 +56,7 @@ namespace LBD.DAL.Mysql
 
         public void Update<T>(T t) where T : LbdBaseModel, new()
         {
-            var sql = MysqlCache<T>.GetUpdate(t,out MySqlParameter[] paras);
+            var sql = MysqlCache<T>.GetUpdate(t, out MySqlParameter[] paras);
 
             MySqlCommand command = new MySqlCommand(sql);
             command.Parameters.AddRange(paras);
@@ -64,13 +64,13 @@ namespace LBD.DAL.Mysql
 
         }
 
-        public  void Delete<T>(T t) where T : LbdBaseModel, new()
+        public void Delete<T>(T t) where T : LbdBaseModel, new()
         {
             var sql = MysqlCache<T>.GetDelete(t, out MySqlParameter parameter);
             MySqlCommand command = new MySqlCommand(sql);
             command.Parameters.Add(parameter);
             _Commands.Add(command);
-              
+
         }
 
 
@@ -115,7 +115,7 @@ namespace LBD.DAL.Mysql
         public IEnumerable<T> FindList<T>(Expression<Func<T, bool>> expression) where T : LbdBaseModel, new()
         {
             var sql = ExpressionToSql.Find(expression);
-            var result = MySqlAdo.DataReaderToGenericsList<T>( sql, null);
+            var result = MySqlAdo.DataReaderToGenericsList<T>(sql, null);
             return result;
         }
 
@@ -150,7 +150,7 @@ namespace LBD.DAL.Mysql
         public void InsertList<T>(IEnumerable<T> ts) where T : LbdBaseModel, new()
         {
 
-          
+
             foreach (var item in ts)
             {
                 item.Validate();
@@ -159,8 +159,8 @@ namespace LBD.DAL.Mysql
                 command.Parameters.AddRange(parameters);
                 _Commands.Add(command);
             }
-           
-          
+
+
         }
     }
 }

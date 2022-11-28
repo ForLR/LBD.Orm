@@ -13,19 +13,22 @@ namespace ConsoleApp1
         static void Main(string[] args)
         {
             ILBDClient db = new LBDClient(new ConnectionConfig(ConfigMange.GetConnStr()));
-            var result = db.Find<Company>(x=>x.Id>1);
-            var results = db.FindList<Company>(x => x.Id > 1&&x.Id!=3);
+            var result = db.Find<Company>(x => x.Id > 1);
+            var results = db.FindList<Company>(x => x.Id > 1 && x.Id != 3);
 
             List<Company> list = new List<Company>();
             for (int i = 0; i < 100; i++)
             {
-                list.Add(new Company() {
-                
-                CreateDate=DateTime.Now,
-                Name=$"张三{i}"
+                list.Add(new Company()
+                {
+
+                    CreateDate = DateTime.Now,
+                    Name = $"张三{i}"
                 });
             }
-           var result2=db.BulkInsert(list);
+            var result2 = db.BulkInsert(list);
+
+            var test = string.Empty;
 
             //result.Name = "test1";
             //db.Update(result);

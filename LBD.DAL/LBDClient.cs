@@ -7,7 +7,7 @@ using System.Text;
 
 namespace LBD.DAL
 {
-    public  class LBDClient : ILBDClient,IDisposable
+    public class LBDClient : ILBDClient, IDisposable
     {
         public LBDClient(ConnectionConfig connectionConfig)
         {
@@ -20,7 +20,7 @@ namespace LBD.DAL
 
         public int BulkInsert<T>(IEnumerable<T> t) where T : LbdBaseModel, new()
         {
-           return this._provider.db.BulkInsert(t);
+            return this._provider.db.BulkInsert(t);
 
         }
 
@@ -36,7 +36,7 @@ namespace LBD.DAL
             GC.Collect();
         }
 
-        public  T Find<T>(int id) where T : LbdBaseModel, new()
+        public T Find<T>(int id) where T : LbdBaseModel, new()
         {
             return this._provider.db.Find<T>(id);
         }
@@ -51,17 +51,17 @@ namespace LBD.DAL
             return this._provider.db.FindList<T>(expression);
         }
 
-        public  void Insert<T>(T t) where T : LbdBaseModel, new()
+        public void Insert<T>(T t) where T : LbdBaseModel, new()
         {
             this._provider.db.Insert<T>(t);
         }
-        public  void SavaChange()
+        public void SavaChange()
         {
             this._provider.db.SavaChange();
 
         }
 
-        public  void Update<T>(T t) where T : LbdBaseModel, new()
+        public void Update<T>(T t) where T : LbdBaseModel, new()
         {
             this._provider.db.Update(t);
         }

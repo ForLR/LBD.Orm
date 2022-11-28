@@ -1,4 +1,4 @@
-﻿    using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
@@ -34,7 +34,7 @@ namespace LBD.Framework.ExppressionExtends
 
             this._stringStack.Push(" ) ");
             base.Visit(node.Right);
-            _stringStack.Push($" { node.NodeType.ToSqlOperator() } ");
+            _stringStack.Push($" {node.NodeType.ToSqlOperator()} ");
             base.Visit(node.Left);
             this._stringStack.Push(" ( ");
 
@@ -69,7 +69,7 @@ namespace LBD.Framework.ExppressionExtends
             {
                 throw new ArgumentNullException("ConstantExpression");
             }
-            _stringStack.Push($"'{ node.Value }'");
+            _stringStack.Push($"'{node.Value}'");
 
             return node;
         }

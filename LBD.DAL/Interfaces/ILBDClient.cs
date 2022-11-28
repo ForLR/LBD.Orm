@@ -4,7 +4,10 @@ using System.Text;
 
 namespace LBD.DAL.Interfaces
 {
-    public interface ILBDClient: ILbdDb,IDisposable
+    /// <summary>
+    /// Client interfac
+    /// </summary>
+    public interface ILBDClient : ILbdDb, IDisposable
     {
 
     }

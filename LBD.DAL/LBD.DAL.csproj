@@ -5,17 +5,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Abstracts\**" />
+    <Compile Remove="SqlServer\**" />
+    <EmbeddedResource Remove="Abstracts\**" />
+    <EmbeddedResource Remove="SqlServer\**" />
+    <None Remove="Abstracts\**" />
+    <None Remove="SqlServer\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MySql.Data" Version="8.0.18" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\LBD.Framework\LBD.Framework.csproj" />
     <ProjectReference Include="..\LBD.Model\LBD.Model.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Abstracts\" />
-    <Folder Include="SqlServer\" />
   </ItemGroup>
 
 </Project>

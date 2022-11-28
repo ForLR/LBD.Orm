@@ -6,9 +6,9 @@ using System.Text;
 namespace LBD.Model
 {
     [LBDTable("Companys")]
-    public class Company:LbdBaseModel
+    public class Company : LbdBaseModel
     {
-        [LBDLength(100,5)]
+        [LBDLength(100, 5)]
         [LBDRequired]
         public string Name { get; set; }
 

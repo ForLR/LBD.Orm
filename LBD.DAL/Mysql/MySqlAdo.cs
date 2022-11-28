@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace LBD.DAL.Mysql
 {
-    public  class MySqlAdo
+    public class MySqlAdo
     {
 
         private static string _connStr = "";
@@ -15,7 +15,7 @@ namespace LBD.DAL.Mysql
             _connStr = connStr;
         }
 
-        public static T DataReaderToGenerics<T>(string sql, MySqlParameter mySqlParameter) where T:new()
+        public static T DataReaderToGenerics<T>(string sql, MySqlParameter mySqlParameter) where T : new()
         {
             T result = new T();
             using (MySqlConnection connection = new MySqlConnection(_connStr))
@@ -37,11 +37,11 @@ namespace LBD.DAL.Mysql
 
                 }
             }
-            
+
             return result;
         }
 
-        public static IEnumerable<T>  DataReaderToGenericsList<T>(string sql, MySqlParameter mySqlParameter) where T : new()
+        public static IEnumerable<T> DataReaderToGenericsList<T>(string sql, MySqlParameter mySqlParameter) where T : new()
         {
             List<T> result = new List<T>();
             using (MySqlConnection connection = new MySqlConnection(_connStr))

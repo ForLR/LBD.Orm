@@ -4,8 +4,11 @@ using System.Text;
 
 namespace LBD.Framework.MappingExtend
 {
-    [AttributeUsage( AttributeTargets.Property)]
-    public abstract class LBDAbstractValidateAttribute:Attribute
+    /// <summary>
+    /// 
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property)]
+    public abstract class LBDAbstractValidateAttribute : Attribute
     {
         public abstract bool Validate(object obj);
     }

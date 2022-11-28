@@ -5,8 +5,8 @@ using System.Text;
 
 namespace LBD.Framework.MappingExtend
 {
-    [AttributeUsage( AttributeTargets.Property| AttributeTargets.Class)]
-    public  abstract class LBDAbstractNameAttribute:Attribute
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
+    public abstract class LBDAbstractNameAttribute : Attribute
     {
         private string _Name { get; set; }
         public LBDAbstractNameAttribute(string name)
