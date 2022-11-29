@@ -8,13 +8,27 @@ namespace LBD.DAL.Mysql
 {
     public class MySqlAdo
     {
-
+        /// <summary>
+        /// 
+        /// </summary>
         private static string _connStr = "";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connStr"></param>
         public static void SetConnStr(string connStr)
         {
             _connStr = connStr;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="mySqlParameter"></param>
+        /// <returns></returns>
         public static T DataReaderToGenerics<T>(string sql, MySqlParameter mySqlParameter) where T : new()
         {
             T result = new T();
@@ -41,6 +55,13 @@ namespace LBD.DAL.Mysql
             return result;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="mySqlParameter"></param>
+        /// <returns></returns>
         public static IEnumerable<T> DataReaderToGenericsList<T>(string sql, MySqlParameter mySqlParameter) where T : new()
         {
             List<T> result = new List<T>();
@@ -64,7 +85,6 @@ namespace LBD.DAL.Mysql
                     result.Add(entity);
                 }
             }
-
             return result;
         }
     }

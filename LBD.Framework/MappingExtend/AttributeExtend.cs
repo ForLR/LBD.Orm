@@ -41,7 +41,7 @@ namespace LBD.Framework.MappingExtend
         {
             if (type.GetProperties().Count(x => x.IsDefined(typeof(LBDKeyAttribute), true)) > 1)
             {
-                throw new LbdException("不支持的多主键");
+                throw new LbdException("暂不支持的多主键");
             }
             return type.GetProperties().FirstOrDefault(x => x.IsDefined(typeof(LBDKeyAttribute), true));
 

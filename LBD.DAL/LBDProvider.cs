@@ -4,6 +4,9 @@ using System;
 
 namespace LBD.DAL
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class LBDProvider
     {
         /// <summary>
@@ -15,9 +18,14 @@ namespace LBD.DAL
             _connection = connection;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private ConnectionConfig _connection { get; set; }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
         public ILbdDb db
         {
             get

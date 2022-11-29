@@ -8,13 +8,25 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
 
 namespace LBD.DAL.Mysql
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class MysqlHelper : ILbdDb
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public static string connStr = ConfigMange.GetConnStr();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public T Find<T>(int id) where T : LbdBaseModel, new()
         {
             Type type = typeof(T);
@@ -102,6 +114,33 @@ namespace LBD.DAL.Mysql
         public int BulkInsert<T>(IEnumerable<T> t) where T : LbdBaseModel, new()
         {
             throw new NotImplementedException();
+        }
+
+        public T FindAsync<T>(int id) where T : LbdBaseModel, new()
+        {
+            Type type = typeof(T);
+            var sql = MysqlCache<T>.GetSelect();
+
+            var propertyInfos = type.GetProperties();
+            using (MySqlConnection connection = new MySqlConnection(connStr))
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            {
+                connection.Open();
+                command.Parameters.Add(new MySqlParameter("@Id", id));
+                var read = command.ExecuteReader();
+
+                if (read.Read())
+                {
+                    T result = new T();
+                    foreach (PropertyInfo property in propertyInfos)
+                    {
+                        var propertyName = property.GetName();
+                        property.SetValue(result, read[propertyName] is DBNull ? null : read[propertyName]);
+                    }
+                    return result;
+                }
+            }
+            return default;
         }
     }
 }

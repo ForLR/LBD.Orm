@@ -22,6 +22,14 @@ namespace LBD.DAL.Interfaces
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        T FindAsync<T>(int id) where T : LbdBaseModel, new();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
         /// <param name="expression"></param>
         /// <returns></returns>
         T Find<T>(Expression<Func<T, bool>> expression) where T : LbdBaseModel, new();

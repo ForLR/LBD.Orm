@@ -14,21 +14,31 @@ using DbType = LBD.DAL.Interfaces.DbType;
 
 namespace LBD.DAL.Mysql
 {
+    /// <summary>
+    /// mysql
+    /// </summary>
     class MysqlHelperDelay : ILbdDb
     {
         internal MysqlHelperDelay(string connection)
         {
-            connStr = connection;
-            MySqlAdo.SetConnStr(connStr);
+            _connStr = connection;
+            MySqlAdo.SetConnStr(_connStr);
         }
 
-        //public static string connStr= ConfigMange.GetConnStr();
-        public static string connStr { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        private static string _connStr { get; set; }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
         private static IList<MySqlCommand> _Commands = new List<MySqlCommand>();
 
-        public DbType DbType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        /// <summary>
+        /// 
+        /// </summary>
+        public DbType DbType { get { return DbType.MYSQL; } }
 
 
         public T Find<T>(int id) where T : LbdBaseModel, new()
@@ -82,7 +92,7 @@ namespace LBD.DAL.Mysql
 
             if (_Commands.Any())
             {
-                using (MySqlConnection connection = new MySqlConnection(connStr))
+                using (MySqlConnection connection = new MySqlConnection(_connStr))
                 {
                     connection.Open();
                     using MySqlTransaction trans = connection.BeginTransaction();
@@ -112,6 +122,12 @@ namespace LBD.DAL.Mysql
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
         public IEnumerable<T> FindList<T>(Expression<Func<T, bool>> expression) where T : LbdBaseModel, new()
         {
             var sql = ExpressionToSql.Find(expression);
@@ -119,13 +135,19 @@ namespace LBD.DAL.Mysql
             return result;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public int BulkInsert<T>(IEnumerable<T> t) where T : LbdBaseModel, new()
         {
             string tablename = MysqlCache<T>._TableName;
             var table = t.ConvertToDataTable(tablename);
             table.ToCsv();
             var columns = table.Columns.Cast<DataColumn>().Select(x => x.ColumnName).ToList();
-            using (MySqlConnection conn = new MySqlConnection(connStr))
+            using (MySqlConnection conn = new MySqlConnection(_connStr))
             {
                 MySqlBulkLoader mySqlBulk = new MySqlBulkLoader(conn)
                 {
@@ -149,8 +171,6 @@ namespace LBD.DAL.Mysql
         /// <param name="ts"></param>
         public void InsertList<T>(IEnumerable<T> ts) where T : LbdBaseModel, new()
         {
-
-
             foreach (var item in ts)
             {
                 item.Validate();
