@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace LBD.DAL.Interfaces
 {
@@ -24,7 +25,7 @@ namespace LBD.DAL.Interfaces
         /// <typeparam name="T"></typeparam>
         /// <param name="id"></param>
         /// <returns></returns>
-        T FindAsync<T>(int id) where T : LbdBaseModel, new();
+        Task<T> FindAsync<T>(int id) where T : LbdBaseModel, new();
 
         /// <summary>
         /// 

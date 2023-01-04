@@ -3,6 +3,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace LBD.DAL.Mysql
 {
@@ -51,7 +52,37 @@ namespace LBD.DAL.Mysql
 
                 }
             }
+            return result;
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="mySqlParameter"></param>
+        /// <returns></returns>
+        public static async Task<T> DataReaderToGenericsAsync<T>(string sql, MySqlParameter mySqlParameter) where T : new()
+        {
+            T result = new T();
+            using (MySqlConnection connection = new MySqlConnection(_connStr))
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            {
+                await connection.OpenAsync();
+                if (mySqlParameter != null)
+                {
+                    command.Parameters.Add(mySqlParameter);
+                }
+                var read = await command.ExecuteReaderAsync();
+                if (read.Read() && !read.IsClosed)
+                {
+                    foreach (PropertyInfo property in typeof(T).GetProperties())
+                    {
+                        var propertyName = property.GetName();
+                        property.SetValue(result, read[propertyName] is DBNull ? null : read[propertyName]);
+                    }
+                }
+            }
             return result;
         }
 
@@ -74,6 +105,39 @@ namespace LBD.DAL.Mysql
                     command.Parameters.Add(mySqlParameter);
                 }
                 var read = command.ExecuteReader();
+                while (read.Read())
+                {
+                    T entity = new T();
+                    foreach (PropertyInfo property in typeof(T).GetProperties())
+                    {
+                        var propertyName = property.GetName();
+                        property.SetValue(entity, read[propertyName] is DBNull ? null : read[propertyName]);
+                    }
+                    result.Add(entity);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="mySqlParameter"></param>
+        /// <returns></returns>
+        public static async Task<IEnumerable<T>> DataReaderToGenericsListAsync<T>(string sql, MySqlParameter mySqlParameter) where T : new()
+        {
+            List<T> result = new List<T>();
+            using (MySqlConnection connection = new MySqlConnection(_connStr))
+            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            {
+                await connection.OpenAsync();
+                if (mySqlParameter != null)
+                {
+                    command.Parameters.Add(mySqlParameter);
+                }
+                var read = await command.ExecuteReaderAsync();
                 while (read.Read())
                 {
                     T entity = new T();

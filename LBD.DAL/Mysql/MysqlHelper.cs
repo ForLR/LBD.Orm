@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace LBD.DAL.Mysql
 {
@@ -57,7 +58,6 @@ namespace LBD.DAL.Mysql
         public void Insert<T>(T t) where T : LbdBaseModel, new()
         {
             var sql = MysqlCache<T>.GetInsert(t, out MySqlParameter[] parameters);
-
             using (MySqlConnection connection = new MySqlConnection(connStr))
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
@@ -116,7 +116,7 @@ namespace LBD.DAL.Mysql
             throw new NotImplementedException();
         }
 
-        public T FindAsync<T>(int id) where T : LbdBaseModel, new()
+        public async Task<T> FindAsync<T>(int id) where T : LbdBaseModel, new()
         {
             Type type = typeof(T);
             var sql = MysqlCache<T>.GetSelect();
@@ -125,9 +125,9 @@ namespace LBD.DAL.Mysql
             using (MySqlConnection connection = new MySqlConnection(connStr))
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             {
-                connection.Open();
+                await connection.OpenAsync();
                 command.Parameters.Add(new MySqlParameter("@Id", id));
-                var read = command.ExecuteReader();
+                var read = await command.ExecuteReaderAsync();
 
                 if (read.Read())
                 {

@@ -9,6 +9,6 @@ namespace LBD.DAL.Interfaces
         MSSQLSERVER,
 
         MYSQL
-            
+
     }
 }

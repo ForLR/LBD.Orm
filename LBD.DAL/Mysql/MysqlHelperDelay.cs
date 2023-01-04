@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using DbType = LBD.DAL.Interfaces.DbType;
 
 namespace LBD.DAL.Mysql
@@ -43,18 +44,31 @@ namespace LBD.DAL.Mysql
 
         public T Find<T>(int id) where T : LbdBaseModel, new()
         {
-
-            var sql = MysqlCache<T>.GetSelect();
-            var result = MySqlAdo.DataReaderToGenerics<T>(sql, new MySqlParameter("@Id", id));
+            var result = MySqlAdo.DataReaderToGenerics<T>(MysqlCache<T>.GetSelect(), new MySqlParameter("@Id", id));
             return result;
         }
+
+
+        public async Task<T> FindAsync<T>(int id) where T : LbdBaseModel, new()
+        {
+            var result = await MySqlAdo.DataReaderToGenericsAsync<T>(MysqlCache<T>.GetSelect(), new MySqlParameter("@Id", id));
+            return result;
+        }
+
         public T Find<T>(Expression<Func<T, bool>> expression) where T : LbdBaseModel, new()
         {
-
             var sql = ExpressionToSql.Find(expression);
             var result = MySqlAdo.DataReaderToGenerics<T>(sql, null);
             return result;
         }
+
+        public async Task<T> FindAsync<T>(Expression<Func<T, bool>> expression) where T : LbdBaseModel, new()
+        {
+            var sql = ExpressionToSql.Find(expression);
+            var result = await MySqlAdo.DataReaderToGenericsAsync<T>(sql, null);
+            return result;
+        }
+
         public void Insert<T>(T t) where T : LbdBaseModel, new()
         {
             t.Validate();
@@ -67,7 +81,6 @@ namespace LBD.DAL.Mysql
         public void Update<T>(T t) where T : LbdBaseModel, new()
         {
             var sql = MysqlCache<T>.GetUpdate(t, out MySqlParameter[] paras);
-
             MySqlCommand command = new MySqlCommand(sql);
             command.Parameters.AddRange(paras);
             _Commands.Add(command);
@@ -83,13 +96,11 @@ namespace LBD.DAL.Mysql
 
         }
 
-
         /// <summary>
         /// 延迟提交 统一事务
         /// </summary>
         public void SavaChange()
         {
-
             if (_Commands.Any())
             {
                 using (MySqlConnection connection = new MySqlConnection(_connStr))
@@ -139,6 +150,19 @@ namespace LBD.DAL.Mysql
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, bool>> expression) where T : LbdBaseModel, new()
+        {
+            var sql = ExpressionToSql.Find(expression);
+            var result = await MySqlAdo.DataReaderToGenericsListAsync<T>(sql, null);
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
         /// <param name="t"></param>
         /// <returns></returns>
         public int BulkInsert<T>(IEnumerable<T> t) where T : LbdBaseModel, new()
@@ -179,8 +203,6 @@ namespace LBD.DAL.Mysql
                 command.Parameters.AddRange(parameters);
                 _Commands.Add(command);
             }
-
-
         }
     }
 }

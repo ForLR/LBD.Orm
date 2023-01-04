@@ -3,6 +3,7 @@ using LBD.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace LBD.DAL
 {
@@ -79,6 +80,11 @@ namespace LBD.DAL
         public T Find<T>(Expression<Func<T, bool>> expression) where T : LbdBaseModel, new()
         {
             return this._provider.db.Find<T>(expression);
+        }
+
+        public async Task<T> FindAsync<T>(int id) where T : LbdBaseModel, new()
+        {
+            return await this._provider.db.FindAsync<T>(id);
         }
 
         public IEnumerable<T> FindList<T>(Expression<Func<T, bool>> expression) where T : LbdBaseModel, new()
