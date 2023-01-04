@@ -32,7 +32,7 @@ namespace LBD.DAL
             {
                 if (_connection.DbType == DbType.MYSQL)
                 {
-                    return new MysqlHelperDelay(_connection.Connection);
+                    return new MysqlHelper(_connection.Connection);
                 }
                 throw new NotSupportedException("暂不支持的数据库");
             }

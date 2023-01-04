@@ -1,4 +1,5 @@
-﻿using LBD.Framework.MappingExtend;
+﻿using LBD.Common.Execptions;
+using LBD.Framework.MappingExtend;
 using System.Linq;
 using System.Reflection;
 
@@ -24,7 +25,6 @@ namespace LBD.Framework.Validates
                         throw new LbdException("数据验证错误");
                     }
                 }
-
             }
 
             return true;

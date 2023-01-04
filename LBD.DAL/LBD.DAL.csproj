@@ -14,10 +14,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="8.0.18" />
+    <PackageReference Include="MySql.Data" Version="8.0.31" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\LBD.Common\LBD.Common.csproj" />
     <ProjectReference Include="..\LBD.Framework\LBD.Framework.csproj" />
     <ProjectReference Include="..\LBD.Model\LBD.Model.csproj" />
   </ItemGroup>

@@ -1,6 +1,6 @@
+using LBD.Common;
 using LBD.DAL;
 using LBD.DAL.Interfaces;
-using LBD.Framework;
 using LBD.Model;
 
 namespace LBD.Tests

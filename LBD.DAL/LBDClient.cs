@@ -96,10 +96,15 @@ namespace LBD.DAL
         {
             this._provider.db.Insert<T>(t);
         }
+
         public void SavaChange()
         {
             this._provider.db.SavaChange();
+        }
 
+        public async Task SavaChangeAsync()
+        {
+            await this._provider.db.SavaChangeAsync();
         }
 
         public void Update<T>(T t) where T : LbdBaseModel, new()

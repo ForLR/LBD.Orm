@@ -76,6 +76,11 @@ namespace LBD.DAL.Interfaces
         /// 
         /// </summary>
         void SavaChange();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Task SavaChangeAsync();
     }
 
 }

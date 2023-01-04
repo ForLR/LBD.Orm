@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using LBD.Common.Execptions;
+using System.Linq.Expressions;
 
 namespace LBD.Framework.ExppressionExtends
 {

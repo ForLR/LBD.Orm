@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.IO;
 
-namespace LBD.Framework
+namespace LBD.Common
 {
     /// <summary>
     /// 获取链接字符串

@@ -1,146 +1,238 @@
-﻿using LBD.DAL.Interfaces;
-using LBD.Framework;
-using LBD.Framework.MappingExtend;
+﻿using LBD.Common.Execptions;
+using LBD.DAL.Interfaces;
+using LBD.Framework.ExppressionExtends;
+using LBD.Framework.Extends;
 using LBD.Framework.SQLCache;
+using LBD.Framework.Validates;
 using LBD.Model;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading.Tasks;
+using DbType = LBD.DAL.Interfaces.DbType;
 
 namespace LBD.DAL.Mysql
 {
     /// <summary>
-    /// 
+    /// mysql
     /// </summary>
-    public class MysqlHelper : ILbdDb
+    class MysqlHelper : ILbdDb
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public static string connStr = ConfigMange.GetConnStr();
+        internal MysqlHelper(string connection)
+        {
+            _connStr = connection;
+            MySqlAdo.SetConnStr(_connStr);
+        }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        private static string _connStr { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static IList<MySqlCommand> _Commands = new List<MySqlCommand>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public DbType DbType { get { return DbType.MYSQL; } }
+
+
         public T Find<T>(int id) where T : LbdBaseModel, new()
         {
-            Type type = typeof(T);
-            var sql = MysqlCache<T>.GetSelect();
+            var result = MySqlAdo.DataReaderToGenerics<T>(MysqlCache<T>.GetSelect(), new MySqlParameter("@Id", id));
+            return result;
+        }
 
-            var propertyInfos = type.GetProperties();
-            using (MySqlConnection connection = new MySqlConnection(connStr))
-            using (MySqlCommand command = new MySqlCommand(sql, connection))
-            {
-                connection.Open();
-                command.Parameters.Add(new MySqlParameter("@Id", id));
-                var read = command.ExecuteReader();
 
-                if (read.Read())
-                {
-                    T result = new T();
-                    foreach (PropertyInfo property in propertyInfos)
-                    {
-                        var propertyName = property.GetName();
-                        property.SetValue(result, read[propertyName] is DBNull ? null : read[propertyName]);
-                    }
-                    return result;
-                }
-            }
-            return default;
+        public async Task<T> FindAsync<T>(int id) where T : LbdBaseModel, new()
+        {
+            var result = await MySqlAdo.DataReaderToGenericsAsync<T>(MysqlCache<T>.GetSelect(), new MySqlParameter("@Id", id));
+            return result;
+        }
+
+        public T Find<T>(Expression<Func<T, bool>> expression) where T : LbdBaseModel, new()
+        {
+            var sql = ExpressionToSql.Find(expression);
+            var result = MySqlAdo.DataReaderToGenerics<T>(sql, null);
+            return result;
+        }
+
+        public async Task<T> FindAsync<T>(Expression<Func<T, bool>> expression) where T : LbdBaseModel, new()
+        {
+            var sql = ExpressionToSql.Find(expression);
+            var result = await MySqlAdo.DataReaderToGenericsAsync<T>(sql, null);
+            return result;
         }
 
         public void Insert<T>(T t) where T : LbdBaseModel, new()
         {
+            t.Validate();
             var sql = MysqlCache<T>.GetInsert(t, out MySqlParameter[] parameters);
-            using (MySqlConnection connection = new MySqlConnection(connStr))
-            using (MySqlCommand command = new MySqlCommand(sql, connection))
-            {
-
-                connection.Open();
-                command.Parameters.AddRange(parameters);
-                command.ExecuteNonQuery();
-            }
+            MySqlCommand command = new MySqlCommand(sql);
+            command.Parameters.AddRange(parameters);
+            _Commands.Add(command);
         }
 
         public void Update<T>(T t) where T : LbdBaseModel, new()
         {
             var sql = MysqlCache<T>.GetUpdate(t, out MySqlParameter[] paras);
-
-            using (MySqlConnection connection = new MySqlConnection(connStr))
-            using (MySqlCommand command = new MySqlCommand(sql, connection))
-            {
-
-                connection.Open();
-                command.Parameters.AddRange(paras);
-                command.ExecuteNonQuery();
-            }
+            MySqlCommand command = new MySqlCommand(sql);
+            command.Parameters.AddRange(paras);
+            _Commands.Add(command);
 
         }
 
         public void Delete<T>(T t) where T : LbdBaseModel, new()
         {
             var sql = MysqlCache<T>.GetDelete(t, out MySqlParameter parameter);
-            using (MySqlConnection connection = new MySqlConnection(connStr))
-            using (MySqlCommand command = new MySqlCommand(sql, connection))
-            {
-
-                connection.Open();
-                command.Parameters.Add(parameter);
-                command.ExecuteNonQuery();
-            }
+            MySqlCommand command = new MySqlCommand(sql);
+            command.Parameters.Add(parameter);
+            _Commands.Add(command);
 
         }
 
+        /// <summary>
+        /// 延迟提交 统一事务
+        /// </summary>
         public void SavaChange()
         {
-        }
-
-        public T Find<T>(Expression<Func<T, bool>> expression) where T : LbdBaseModel, new()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<T> FindList<T>(Expression<Func<T, bool>> expression) where T : LbdBaseModel, new()
-        {
-            throw new NotImplementedException();
-        }
-
-        public int BulkInsert<T>(IEnumerable<T> t) where T : LbdBaseModel, new()
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<T> FindAsync<T>(int id) where T : LbdBaseModel, new()
-        {
-            Type type = typeof(T);
-            var sql = MysqlCache<T>.GetSelect();
-
-            var propertyInfos = type.GetProperties();
-            using (MySqlConnection connection = new MySqlConnection(connStr))
-            using (MySqlCommand command = new MySqlCommand(sql, connection))
+            if (_Commands.Any())
             {
-                await connection.OpenAsync();
-                command.Parameters.Add(new MySqlParameter("@Id", id));
-                var read = await command.ExecuteReaderAsync();
-
-                if (read.Read())
+                using (MySqlConnection connection = new MySqlConnection(_connStr))
                 {
-                    T result = new T();
-                    foreach (PropertyInfo property in propertyInfos)
+                    connection.Open();
+                    using MySqlTransaction trans = connection.BeginTransaction();
+                    try
                     {
-                        var propertyName = property.GetName();
-                        property.SetValue(result, read[propertyName] is DBNull ? null : read[propertyName]);
+                        foreach (MySqlCommand command in _Commands)
+                        {
+                            command.Connection = connection;
+                            command.Transaction = trans;
+                            command.ExecuteNonQuery();
+
+                        }
+                        trans.Commit();
                     }
-                    return result;
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        throw new LbdException($"SavaChange Error", ex);
+                    }
+                    finally
+                    {
+                        _Commands?.Clear();
+                    }
                 }
             }
-            return default;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public IEnumerable<T> FindList<T>(Expression<Func<T, bool>> expression) where T : LbdBaseModel, new()
+        {
+            var sql = ExpressionToSql.Find(expression);
+            var result = MySqlAdo.DataReaderToGenericsList<T>(sql, null);
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<T>> FindListAsync<T>(Expression<Func<T, bool>> expression) where T : LbdBaseModel, new()
+        {
+            var sql = ExpressionToSql.Find(expression);
+            var result = await MySqlAdo.DataReaderToGenericsListAsync<T>(sql, null);
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public int BulkInsert<T>(IEnumerable<T> t) where T : LbdBaseModel, new()
+        {
+            string tablename = MysqlCache<T>._TableName;
+            var table = t.ConvertToDataTable(tablename);
+            table.ToCsv();
+            var columns = table.Columns.Cast<DataColumn>().Select(x => x.ColumnName).ToList();
+            using (MySqlConnection conn = new MySqlConnection(_connStr))
+            {
+                MySqlBulkLoader mySqlBulk = new MySqlBulkLoader(conn)
+                {
+                    FieldTerminator = ",",
+                    FieldQuotationCharacter = '"',
+                    EscapeCharacter = '"',
+                    LineTerminator = "\r\n",
+                    FileName = table.TableName + ".csv",
+                    NumberOfLinesToSkip = 0,
+                    TableName = table.TableName,
+                };
+                mySqlBulk.Columns.AddRange(columns);
+                return mySqlBulk.Load();
+            }
+        }
+
+        /// <summary>
+        /// 多条insert（临时版本）
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ts"></param>
+        public void InsertList<T>(IEnumerable<T> ts) where T : LbdBaseModel, new()
+        {
+            foreach (var item in ts)
+            {
+                item.Validate();
+                var sql = MysqlCache<T>.GetInsert(item, out MySqlParameter[] parameters);
+                MySqlCommand command = new MySqlCommand(sql);
+                command.Parameters.AddRange(parameters);
+                _Commands.Add(command);
+            }
+        }
+
+        public async Task SavaChangeAsync()
+        {
+            if (_Commands.Any())
+            {
+                using (MySqlConnection connection = new MySqlConnection(_connStr))
+                {
+                    await connection.OpenAsync();
+                    using MySqlTransaction trans = connection.BeginTransaction();
+                    try
+                    {
+                        foreach (MySqlCommand command in _Commands)
+                        {
+                            command.Connection = connection;
+                            command.Transaction = trans;
+                            await command.ExecuteNonQueryAsync();
+                        }
+                        trans.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        throw new LbdException($"SavaChangeAsync Error", ex);
+                    }
+                    finally
+                    {
+                        _Commands?.Clear();
+                    }
+                }
+            }
         }
     }
 }
