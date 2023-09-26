@@ -28,7 +28,6 @@
         public override bool Validate(object obj)
         {
             return (obj != null && obj.ToString().Length > MinLength && obj.ToString().Length < MaxLength);
-
         }
     }
 }
